@@ -125,13 +125,17 @@ class Tree {
     }
   }
 
-  find(val, node) {
+  find(val) {
+    return this.findRec(val, this.root);
+  }
+
+  findRec(val, node) {
     if (!node) return null;
 
     if (val > node.data) {
-      return this.find(val, node.right);
+      return this.findRec(val, node.right);
     } else if (val < node.data) {
-      return this.find(val, node.left);
+      return this.findRec(val, node.left);
     } else if (val === node.data) {
       return node;
     }
@@ -203,6 +207,21 @@ class Tree {
     if (node.right) this.postOrderForEachRec(callback, node.right);
     callback(node);
   }
+
+  height(val) {
+    const node = this.find(val);
+    return this.goDown(node, 0, 0);
+  }
+
+  goDown(node, depth, maxDepth) {
+    if (depth > maxDepth) maxDepth = depth;
+
+    if (node.left) maxDepth = this.goDown(node.left, depth + 1, maxDepth);
+
+    if (node.right) maxDepth = this.goDown(node.right, depth + 1, maxDepth);
+
+    return maxDepth;
+  }
 }
 
 let shcwanz = [
@@ -212,10 +231,4 @@ const tree = new Tree();
 tree.buildTree(shcwanz);
 tree.insert(6, tree.root);
 tree.prettyPrint(tree.root);
-console.log(tree.find(6, tree.root));
-tree.deleteItem(8, tree.root, tree.root);
-tree.prettyPrint(tree.root);
-tree.postOrderForEach((node) => {
-  node.data *= 2;
-});
-tree.prettyPrint(tree.root);
+console.log(tree.height(12));
