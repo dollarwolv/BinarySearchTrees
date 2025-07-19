@@ -222,6 +222,20 @@ class Tree {
 
     return maxDepth;
   }
+
+  depth(val) {
+    return this.depthRec(val, this.root, 0, 0);
+  }
+
+  depthRec(val, node, depth) {
+    if (val > node.data) {
+      return this.depthRec(val, node.right, depth + 1);
+    } else if (val < node.data) {
+      return this.depthRec(val, node.left, depth + 1);
+    } else if (val === node.data) {
+      return depth;
+    }
+  }
 }
 
 let shcwanz = [
@@ -231,4 +245,4 @@ const tree = new Tree();
 tree.buildTree(shcwanz);
 tree.insert(6, tree.root);
 tree.prettyPrint(tree.root);
-console.log(tree.height(12));
+console.log(tree.depth(3));
