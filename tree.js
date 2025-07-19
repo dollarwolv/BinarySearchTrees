@@ -69,6 +69,14 @@ class Tree {
       return this.deleteItem(val, node.left, previousNode);
     } else if (val === node.data) {
       // logic to delete item
+      // case 0: node is root
+      if (node === this.root && !previousNode) {
+        const pseudoRoot = new Node(null);
+        pseudoRoot.left = this.root;
+        this.deleteItem(val, this.root, pseudoRoot);
+        this.root = pseudoRoot.left;
+        return;
+      }
       // case 1: node is a leaf
       if (!node.left && !node.right) {
         if (previousNode.left && previousNode.left.data === val) {
@@ -113,7 +121,6 @@ class Tree {
         } else {
           parent.left = childNode.right;
         }
-        childNode = null;
       }
     }
   }
@@ -136,21 +143,65 @@ class Tree {
   }
 
   levelOrderForEachRec(callback, node, queue) {
-    if (!callback) {
+    if (!callback || typeof callback !== "function") {
       throw new Error("No callback function provided.");
     }
-    if (!node) {
-      return;
-    }
+    if (!node) return;
+
     callback(queue[0]);
     queue.shift();
-    if (node.left) {
-      queue.push(node.left);
-    }
-    if (node.right) {
-      queue.push(node.right);
-    }
+
+    if (node.left) queue.push(node.left);
+    if (node.right) queue.push(node.right);
+
     this.levelOrderForEachRec(callback, queue[0], queue);
+  }
+
+  preOrderForEach(callback) {
+    this.preOrderForEachRec(callback, this.root);
+  }
+
+  preOrderForEachRec(callback, node) {
+    if (!callback || typeof callback !== "function") {
+      throw new Error("No callback function provided.");
+    }
+    if (!node) return;
+
+    console.log(node.data);
+    callback(node);
+
+    if (node.left) this.preOrderForEachRec(callback, node.left);
+    if (node.right) this.preOrderForEachRec(callback, node.right);
+  }
+
+  inOrderForEach(callback) {
+    this.inOrderForEachRec(callback, this.root);
+  }
+
+  inOrderForEachRec(callback, node) {
+    if (!callback || typeof callback !== "function") {
+      throw new Error("No callback function provided.");
+    }
+    if (!node) return;
+
+    if (node.left) this.inOrderForEachRec(callback, node.left);
+    callback(node);
+    if (node.right) this.inOrderForEachRec(callback, node.right);
+  }
+
+  postOrderForEach(callback) {
+    this.postOrderForEachRec(callback, this.root);
+  }
+
+  postOrderForEachRec(callback, node) {
+    if (!callback || typeof callback !== "function") {
+      throw new Error("No callback function provided.");
+    }
+    if (!node) return;
+
+    if (node.left) this.postOrderForEachRec(callback, node.left);
+    if (node.right) this.postOrderForEachRec(callback, node.right);
+    callback(node);
   }
 }
 
@@ -164,7 +215,7 @@ tree.prettyPrint(tree.root);
 console.log(tree.find(6, tree.root));
 tree.deleteItem(8, tree.root, tree.root);
 tree.prettyPrint(tree.root);
-tree.levelOrderForEach((node) => {
+tree.postOrderForEach((node) => {
   node.data *= 2;
 });
 tree.prettyPrint(tree.root);
