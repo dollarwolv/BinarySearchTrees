@@ -41,20 +41,24 @@ class Tree {
     }
   }
 
-  insert(val, node) {
+  insert(val) {
+    this.insertRec(val, this.root);
+  }
+
+  insertRec(val, node) {
     if (!node) return;
     if (val < node.data) {
       if (!node.left) {
         node.left = new Node(val);
       } else {
-        this.insert(val, node.left);
+        this.insertRec(val, node.left);
       }
     }
     if (val > node.data) {
       if (!node.right) {
         node.right = new Node(val);
       } else {
-        this.insert(val, node.right);
+        this.insertRec(val, node.right);
       }
     }
   }
@@ -210,6 +214,7 @@ class Tree {
 
   height(val) {
     const node = this.find(val);
+    if (node === null) throw new Error("Value not in tree.");
     return this.goDown(node, 0, 0);
   }
 
@@ -224,6 +229,7 @@ class Tree {
   }
 
   depth(val) {
+    if (this.find(val) === null) throw new Error("Value not in tree.");
     return this.depthRec(val, this.root, 0, 0);
   }
 
@@ -236,13 +242,47 @@ class Tree {
       return depth;
     }
   }
+
+  isBalanced() {
+    return this.isBalancedRec(this.root);
+  }
+
+  isBalancedRec(node) {
+    if (!node) return true;
+
+    let leftHeight = node.left ? this.height(node.left.data) : 0;
+    let rightHeight = node.right ? this.height(node.right.data) : 0;
+
+    if (Math.abs(leftHeight - rightHeight) > 1) return false;
+
+    const leftBalanced = this.isBalancedRec(node.left);
+    const rightBalanced = this.isBalancedRec(node.right);
+    return leftBalanced && rightBalanced;
+  }
+
+  rebalance() {
+    let arr = [];
+    this.inOrderForEach((node) => {
+      arr.push(node.data);
+    });
+    this.buildTree(arr);
+  }
 }
 
-let shcwanz = [
-  1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324, 12, 14, 18, 22, 11, 14, 29,
-];
+// test everything
+const arr = Array.from({ length: 100 }, () => Math.floor(Math.random() * 100));
 const tree = new Tree();
-tree.buildTree(shcwanz);
-tree.insert(6, tree.root);
+tree.buildTree(arr);
 tree.prettyPrint(tree.root);
-console.log(tree.depth(3));
+console.log(tree.isBalanced());
+tree.insert(120);
+tree.insert(130);
+tree.insert(150);
+tree.insert(210);
+tree.insert(187);
+tree.insert(209);
+console.log(tree.isBalanced());
+tree.prettyPrint(tree.root);
+tree.rebalance();
+tree.prettyPrint(tree.root);
+console.log(tree.isBalanced());
